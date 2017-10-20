@@ -1,0 +1,50 @@
+@import 'defs.less';
+
+.common-info {
+
+    width: auto;
+    height: auto;
+    float: right;
+    
+    background-color: @COL_L;
+
+    padding: 2%;
+
+    & > svg {
+        padding: 1em;
+        float: right;
+    }
+
+    & > h3 {
+        margin-top: 0.8em;
+        margin-bottom: 0.5em;
+        margin-left: 0.5em;
+    }
+
+    &:hover {
+
+        width: 50%;
+        
+        border-color: @COL_D;
+        border-width: 0.2em;
+        border-style: solid;
+
+        & > svg {
+            padding: 0em;
+        }
+
+        & > .-normally-visable {
+            display: none;
+        }
+        & > .-normally-hidden {
+            display: inline-block;
+        }
+    }
+
+    & > .-normally-visable {
+        display: inline-block;
+    }
+    & > .-normally-hidden {
+        display: none;
+    }
+}

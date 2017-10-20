@@ -12,6 +12,7 @@ import ContentCommonBodyBy				from 'com/content-common/common-body-by';
 import ContentCommonBodyTitle			from 'com/content-common/common-body-title';
 import ContentCommonBodyAvatar			from 'com/content-common/common-body-avatar';
 import ContentCommonBodyMarkup			from 'com/content-common/common-body-markup';
+import ContentCommonInfo				from 'com/content-common/common-info';
 
 import PieChart							from 'com/visualization/piechart/piechart';
 
@@ -142,6 +143,7 @@ export default class ContentStatsEvent extends Component {
 				return (
 					<ContentCommon {...props} class={cN(Class)}>
 						<ContentCommonBodyTitle title="Statistics" />
+						<ContentCommonInfo title="This is an info box" message="Info box's are popups that contain some useful infomation about another element on the page."/>
 						<ContentCommonBody>
 							{Data}
 						</ContentCommonBody>
