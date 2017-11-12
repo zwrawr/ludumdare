@@ -208,6 +208,7 @@ export default class Renderer {
 							}
 						}
 						// smart but none embedable domain found, these get icons next to them
+						console.log(url);
 						return {"type": "smart", "info": smartdomain};
 					}
 				}
@@ -260,6 +261,9 @@ export default class Renderer {
 		else if ( result.type == "smart" ) {
 			hasText = hasText && !/^\s+$/.test(joinedText); // make sure the link isn't all whitespace too
 			let partial = href.substring(href.indexOf(result.info.domain) + result.info.domain.length);
+
+			console.log(result.info.domain, partial, text);
+
 			return <SmartLink icon_name={result.info.icon_name} full_url={href} domain={(hasText) ? "" : result.info.domain} part_url={(hasText) ? text : partial}></SmartLink>;
 		}
 		else if ( result.type == "embed" ) {
