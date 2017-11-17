@@ -279,7 +279,6 @@ export default class InlineLexer {
    * Compile Link
    */
   outputLink(cap, link) {
-	console.log("Lexer : ", cap ,link);
     var href = Util.escape(link.href),
       title = link.title
         ? Util.escape(link.title)

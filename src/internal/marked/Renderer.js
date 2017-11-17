@@ -177,14 +177,16 @@ export default class Renderer {
 			// static domain link, something on our static server
 			return {"type": "static"};
 		}
-		else if ( href.indexOf('//') == 0 ) {
-			// same protocol link, use the current protocol to link to anothor site
-			return {"type": "protocol"};
-		}
-		else if ( href.indexOf('/') == 0 ) {
-			// relative domain link
+		else if ( (href.indexOf('/') == 0) && (href.indexOf('//') != 0) ) {
+			// relative link
 			return {"type": "relative"};
 		}
+		else if ( href.indexOf('#/') == 0 ) {
+			// anchor link
+			return {"type": "anchor"};
+		}
+
+
 
 		url = extractFromURL(href);
 
@@ -254,27 +256,27 @@ export default class Renderer {
 			return "";
 		}
 
+		console.log(result.type, href);
+
 		if ( result.type == "simple" ) {
 			hasText = hasText && !/^\s+$/.test(text); // make sure the link isn't all whitespace too
 			return <NavLink href={href} title={title} target={"_blank"}>{(hasText) ? text : href}</NavLink>;
 		}
+		if ( result.type == "anchor" ) {
+			console.log("href: ", href);
+			hasText = hasText && !/^\s+$/.test(text); // make sure the link isn't all whitespace too
+			return <NavLink href={href} title={title} target={"_self"}>{(hasText) ? text : "#"+href.substr(2)}</NavLink>;
+		}
 		else if ( result.type == "smart" ) {
-			hasText = hasText && !/^\s+$/.test(joinedText); // make sure the link isn't all whitespace too
+			hasText = hasText && !/^\s+$/.test(text); // make sure the link isn't all whitespace too
 			let partial = href.substring(href.indexOf(result.info.domain) + result.info.domain.length);
-
-			console.log(result.info.domain, partial, text);
-
 			return <SmartLink icon_name={result.info.icon_name} full_url={href} domain={(hasText) ? "" : result.info.domain} part_url={(hasText) ? text : partial}></SmartLink>;
 		}
 		else if ( result.type == "embed" ) {
 			return <AutoEmbed link={result} title={title} text={(hasText) ? text : href} />;
 		}
 		else if ( result.type == "relative" ) {
-			return <LocalLink href={href} text={(hasText) ? text : href} title={title} target={"_blank"}/>;
-		}
-		else if ( result.type == "protocol" ) {
-			hasText = hasText && !/^\s+$/.test(joinedText); // make sure the link isn't all whitespace too
-			return <NavLink href={href} text={(hasText) ? joinedText : href.substr(2)} title={title} target={"_blank"}/>;
+			return <LocalLink href={href} text={(hasText) ? text : href} title={title} />;
 		}
 		else if ( result.type == "static" ) {
 			hasText = hasText && !/^\s+$/.test(joinedText); // make sure the link isn't all whitespace too

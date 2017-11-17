@@ -444,16 +444,20 @@ class Main extends Component {
 	}
 
 	handleAnchors() {
+		console.log("Handling Anchors");
 		if ( window.location.hash ) {
+			console.log("Found hash", window.location.hash);
 			var hash = Sanitize.parseHash(window.location.hash);
 
 			if ( hash.path === "" && hash.extra.length > 0 ) {
+
 				var heading = document.getElementById(hash.extra[0]);
 				if ( heading ) {
 					heading.scrollIntoView();
 
 					var viewBar = document.getElementsByClassName("view-bar")[0];
 					if ( viewBar ) {
+						console.log("Scrolling to anchor");
 						window.scrollBy(0, -viewBar.clientHeight);
 					}
 				}
