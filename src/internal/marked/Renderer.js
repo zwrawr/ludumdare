@@ -265,7 +265,7 @@ export default class Renderer {
 		if ( result.type == "anchor" ) {
 			console.log("href: ", href);
 			hasText = hasText && !/^\s+$/.test(text); // make sure the link isn't all whitespace too
-			return <NavLink href={href} title={title} target={"_self"}>{(hasText) ? text : "#"+href.substr(2)}</NavLink>;
+			return <a href={href} title={title} target="_self">{(hasText) ? text : "#"+href.substr(2)}</a>;
 		}
 		else if ( result.type == "smart" ) {
 			hasText = hasText && !/^\s+$/.test(text); // make sure the link isn't all whitespace too
