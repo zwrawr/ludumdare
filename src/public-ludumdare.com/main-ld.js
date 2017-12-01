@@ -444,7 +444,6 @@ class Main extends Component {
 	}
 
 	handleAnchors() {
-		console.log("Handling Anchors");
 		if ( window.location.hash ) {
 			console.log("Found hash", window.location.hash);
 			var hash = Sanitize.parseHash(window.location.hash);

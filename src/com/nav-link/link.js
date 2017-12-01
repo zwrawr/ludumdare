@@ -37,6 +37,9 @@ export default class NavLink extends Component {
 	}
 
 	onClick( e ) {
+
+		console.log(e);
+
 		// Bail if blanking behavior is requested
 		if ( this.props.blank )
 			return;
