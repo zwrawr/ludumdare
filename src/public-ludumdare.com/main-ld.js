@@ -1,5 +1,9 @@
 import {h, render, Component, options}	from 'preact/preact';
-import {initDevTools}					from 'preact-devtools/devtools';
+
+// @ifdef DEBUG
+import {}								from 'preact-devtools/devtools';
+// @endif
+
 import Sanitize							from 'internal/sanitize/sanitize';
 
 import Router							from 'com/router/router';
@@ -45,9 +49,6 @@ import $NodeLove						from 'shrub/js/node/node_love';
 window.LUDUMDARE_ROOT = '/';
 window.SITE_ROOT = 1;
 
-if ( SITE_DEBUG ) {
-	initDevTools();
-}
 
 // NOTE: Deprecated
 // Add special behavior: when class attribute is an array, flatten it to a string
@@ -66,11 +67,16 @@ options.vnode = function(vnode) {
 class Main extends Component {
 	constructor( props ) {
 		super(props);
-		console.log('[constructor]');
+		console.log("[constructor]");
+		// @ifdef DEBUG
+		console.log("Running in DEBUG mode");
+		// @endif
 
 		var clean = this.cleanLocation(window.location);
 		if ( window.location.origin+clean.path !== window.location.href ) {
+			// @ifdef DEBUG
 			console.log("Cleaned URL: "+window.location.href+" => "+window.location.origin+clean.path);
+			// @endif
 
 			this.storeHistory(window.history.state, null, clean.path);
 		}
@@ -527,39 +533,37 @@ class Main extends Component {
 		}
 
 		return (
-			<div id="app">
-				<Layout {...this.state}>
-					<Router node={node} props={props} path={extra}>
-						<Route type="root" component={PageHome}>
-							<Route static path="/my">
-								<Route static path="/settings" component={PageMySettings} />
-								<Route static path="/notifications" component={PageMyNotifications} />
-							</Route>
-							<Route static path="/dev">
-								<Route static path="/palette" component={PageDevPalette} />
-							</Route>
+			<Layout {...this.state}>
+				<Router node={node} props={props} path={extra}>
+					<Route type="root" component={PageHome}>
+						<Route static path="/my">
+							<Route static path="/settings" component={PageMySettings} />
+							<Route static path="/notifications" component={PageMyNotifications} />
 						</Route>
-
-						<Route type="page" component={PagePage} />
-						<Route type="post" component={PagePost} />
-
-						<Route type="item">
-							<Route subtype="game" component={PageItem} />
+						<Route static path="/dev">
+							<Route static path="/palette" component={PageDevPalette} />
 						</Route>
+					</Route>
 
-						<Route type="tag" component={PageTag} />
+					<Route type="page" component={PagePage} />
+					<Route type="post" component={PagePost} />
 
-						<Route type="user" component={PageUser} />
-						<Route type="users" component={PageUsers} />
+					<Route type="item">
+						<Route subtype="game" component={PageItem} />
+					</Route>
 
-						<Route type="event" component={PageEvent} />
-						<Route type={["events", "group", "tags"]} component={PageEvents} />
+					<Route type="tag" component={PageTag} />
 
-						<Route type="error" component={PageError} />
-					</Router>
-					{this.getDialog()}
-				</Layout>
-			</div>
+					<Route type="user" component={PageUser} />
+					<Route type="users" component={PageUsers} />
+
+					<Route type="event" component={PageEvent} />
+					<Route type={["events", "group", "tags"]} component={PageEvents} />
+
+					<Route type="error" component={PageError} />
+				</Router>
+				{this.getDialog()}
+			</Layout>
 		);
 	}
 }

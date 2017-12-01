@@ -83,7 +83,7 @@ function notification_CountUnread( $user ) {
 function notification_GetUnread( $user, $limit = 20, $offset = 0 ) {
 	$last_read = notification_GetLastReadNotification( $user );
 	return db_QueryFetch(
-		"SELECT id, node, note, type, created
+		"SELECT id, node, note, type, ".DB_FIELD_DATE('created')."
 		FROM ".SH_TABLE_PREFIX.SH_TABLE_NOTIFICATION."
 		WHERE user=? AND id > ?
 		ORDER BY id DESC
@@ -108,7 +108,7 @@ function notification_Count( $user ) {
 
 function notification_Get( $user, $limit = 20, $offset = 0 ) {
 	return db_QueryFetch(
-		"SELECT id, node, note, type, created
+		"SELECT id, node, note, type, ".DB_FIELD_DATE('created')."
 		FROM ".SH_TABLE_PREFIX.SH_TABLE_NOTIFICATION."
 		WHERE user=?
 		ORDER BY id DESC
@@ -174,8 +174,25 @@ function notification_AddForNote( $node, $note, $author, $mentions = [] ) {
 			$users[] = $link['a'];
 	}
 	
+	// Look up what users have expressly opted in and out of notifications for this thread.
+	$subs = notification_GetAllSubscriptionsForNode($node);
+	$optin = [];
+	$optout = [];
+	foreach ( $subs as $sub ) {
+		if ( $sub['subscribed'] ) {
+			$optin[] = $sub['user'];
+		}
+		else {
+			$optout[] = $sub['user'];
+		}
+	}
+	
+	// Add users that are opting in to notifications
+	$users = array_merge($users, $optin);	
 	// Eliminate duplicate users - don't send duplicate notifications.
 	$users = array_unique($users);
+	// Remove users that opt-out of notifications
+	$users = array_diff($users, $optout);
 	// Supersede normal notifications with "mention" notifications if the user was at-mentioned
 	$users = array_diff($users, $mentions); 
 	
