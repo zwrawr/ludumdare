@@ -1,0 +1,32 @@
+.chart {
+	& > .-graph {
+		& > .-svg {
+			& > g {
+				& > .-series {
+					& > .-line {
+						fill-opacity: 0;
+					}
+
+					& > .-points {
+						& > .-point {
+							& > .-text {
+								display: none;
+							}
+							&:hover {
+								fill: green;
+							}
+						}
+					}
+
+					& > .-texts {
+						& > .-text {
+							&.-hidden {
+								display: none;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

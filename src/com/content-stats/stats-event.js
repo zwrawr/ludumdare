@@ -15,6 +15,7 @@ import ContentCommonBodyMarkup			from 'com/content-common/common-body-markup';
 
 import PieChart							from 'com/visualization/piechart/piechart';
 import BarChart							from 'com/visualization/barchart/barchart';
+import Graph							from 'com/visualization/graph/graph';
 
 
 import $Stats							from '../../shrub/js/stats/stats';
