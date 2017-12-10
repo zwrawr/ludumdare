@@ -35,7 +35,7 @@ export default class PieChart extends Component {
 			if (props.colors) {
 				color = props.colors[i];
 			} else {
-				color = 1 + ( i % 6 );
+				color = 1 + ( i % 12 );
 			}
 			const legendclass = cN("-shape-circle", "vis_bg_color_"+color, props.class);
 

@@ -38,9 +38,6 @@ export default class Graph extends Component {
 			}
 		}
 
-		console.log({"min": { "x": min_x, "y": min_y}, "max": { "x": max_x, "y": max_y}});
-
-
 		return {"min": { "x": min_x, "y": min_y}, "max": { "x": max_x, "y": max_y}};
 	}
 
@@ -86,7 +83,7 @@ export default class Graph extends Component {
 		let Colors = [];
 
 		for (let i = 0; i < values.length; i++) {
-			Colors.push(1 + ( i % 6 ));
+			Colors.push(1 + ( i % 12 ));
 			Names.push(labels[i]);
 			Lines.push(<Line x={values[i].x} y={values[i].y} sx={svalues[i].x} sy={svalues[i].y} color={Colors[i]}/>);
 		}

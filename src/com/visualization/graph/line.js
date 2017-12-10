@@ -43,16 +43,20 @@ export default class Line extends Component {
 
 		let line = "";
 		for (let i = 0; i < x.length; i++) {
-			if (i == 0) {
-				line += "M"+sx[i]+","+sy[i]+" ";
-			}
-			else {
-				line += "L"+sx[i]+","+sy[i]+" ";
-			}
 
-			const title = "(" + x[i] + "," + y[i] + ")";
-			points.push(<circle cx={sx[i]} cy={sy[i]} class={pointclass} r="1" ></circle>);
-			texts.push(<text x={sx[i]} y={sy[i]} class={textclass}>{title}</text>);
+			if (sy[i] && sx[i]){
+
+				if (i == 0) {
+					line += "M"+sx[i]+","+sy[i]+" ";
+				}
+				else {
+					line += "L"+sx[i]+","+sy[i]+" ";
+				}
+
+				const title = "(" + x[i] + "," + y[i] + ")";
+				points.push(<circle cx={sx[i]} cy={sy[i]} class={pointclass} r="1" ></circle>);
+				texts.push(<text x={sx[i]} y={sy[i]} class={textclass}>{title}</text>);
+			}
 		}
 		//line += "Z";
 

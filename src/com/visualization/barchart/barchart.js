@@ -91,8 +91,9 @@ export default class BarChart extends Component {
 				//continue;
 			}
 
-			let color = 1 + (i % 6);
+			let color = 1 + (i % 12);
 			Bars.push(<Bar valuePos={valuesYPos[i]} zero={yZeroPos} width={barWidth} left={this.scale(firstBarXStart + i, xMaxValue, xZeroPos, 100)} index={i} color={color} />);
+
 
 			if ( !hideLegend ) {
 				if ( use_percentages ) {

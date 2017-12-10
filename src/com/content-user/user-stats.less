@@ -1,0 +1,27 @@
+#content > .page-user > .content-stats.content-stats-user > .-bodies > .content-common-body {
+	& > .section.-grading,
+	& > .section.-ranking {
+		width: 100%;
+		height: auto;
+
+		& > .chart {
+			& > .-legend {
+				max-width: 20%;
+			}
+
+			& > .-graph {
+				width: 80%;
+
+				& > .-svg {
+					& > g {
+						& > .-series {
+							& > .-line {
+								stroke-width: 0.1em;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
