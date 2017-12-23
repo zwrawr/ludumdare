@@ -470,8 +470,6 @@ export default class ContentStatsUser extends Component {
 			}
 
 
-			Data.push(<span>authored : {props.user.private.refs.author.join(", ")} </span>);
-
 			//-
 			return (
 				<ContentCommon {...props} class={cN(Class)}>
