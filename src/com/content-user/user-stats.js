@@ -16,6 +16,7 @@ import Graph							from 'com/visualization/graph/graph';
 
 
 import $Node							from '../../shrub/js/node/node';
+import $Grade							from '../../shrub/js/grade/grade';
 
 
 export default class ContentStatsUser extends Component {
@@ -23,7 +24,9 @@ export default class ContentStatsUser extends Component {
 		super(props);
 
 		this.state = {
-			'games': null
+			'games': null,
+			'grades': null,
+			'events': null
 		};
 	}
 
@@ -32,260 +35,209 @@ export default class ContentStatsUser extends Component {
 		var state = this.state;
 
 		this.getGames();
+		this.getMyGrades();
+		this.getEvents();
 	}
 
+
+	getCategories(featured) {
+
+		//TODO:: read these from the featured meta
+		const ids = [
+			"grade-01",
+			"grade-02",
+			"grade-03",
+			"grade-04",
+			"grade-05",
+			"grade-06",
+			"grade-07",
+			"grade-08"
+		];
+
+		const lables = ids.map( id => featured.meta[id]);
+
+		return {"ids":ids,"lables":lables};
+	}
 
 	getGames() {
 		var props = this.props;
 
-		$Node.Get(props.user.private.refs.author)
+		$Node.GetFeed(props.node.id, 'author', ['item'], ['game'])
 		.then(r => {
-			if ( r.node ) {
-				this.setState({'games': r.node});
+			if (r.feed) {
+
+				//Parse IDs
+				let games = [];
+				r.feed.forEach(g => {
+					games.push(g.id);
+				});
+
+				//Get nodes
+				$Node.Get(games)
+				.then(r => {
+					if ( r.node ) {
+						this.setState({'games': r.node});
+					}
+				});
+			}
+		});
+
+
+	}
+
+	getMyGrades() {
+		var props = this.props;
+
+		// only try to get grades if were looking at our own stats
+		if (props.node.id != props.user.id) {
+			return;
+		}
+
+		$Grade.GetAllMy(props.featured.id)
+		.then(r => {
+			if ( r.grade ) {
+				this.setState({'grades': r.grade});
+			}
+		});
+	}
+
+	getEvents() {
+		$Node.GetFeed(9, 'parent', ['event'])
+		.then(r => {
+			if (r.feed) {
+
+				//Parse IDs
+				let events = [];
+				r.feed.forEach(e => {
+					events.push(e.id);
+				});
+
+				//Get nodes
+				$Node.Get(events)
+				.then( r => {
+					if ( r.node ) {
+						this.setState({'events': r.node});
+					}
+				});
 			}
 		});
 	}
 
 	parseGamesForRatings(games) {
 
-		let values = [
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []}
-		];
+		// Build array for graph
+		let values = [];
+		for (let i = 0; i < 3; i++) {
+			values.push({"x": [],"y": []});
+		}
 
 		games.forEach(game => {
-
 			if (game && game.magic){
-				const event = game.parent;
 
-				const grade = game.magic.grade;
-				const feedback = game.magic.feedback;
-				const given = game.magic.given;
+				values[0].x.push(game.parent);
+				values[0].y.push(game.magic.grade);
 
-				values[0].x.push(event);
-				values[0].y.push(grade);
+				values[1].x.push(game.parent);
+				values[1].y.push(game.magic.feedback);
 
-				values[1].x.push(event);
-				values[1].y.push(feedback);
-
-				values[2].x.push(event);
-				values[2].y.push(given);
+				values[2].x.push(game.parent);
+				values[2].y.push(game.magic.given);
 			}
 		});
 
 		return {"values": values, "lables": ["ratings recived", "feedback given", "ratings given"]};
 	}
 
-	parseGamesForGrading(games) {
+	parseGamesForGrading(games, featured) {
 
-		let values = [
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []}
-		];
+		const categories = this.getCategories(featured);
+
+		// Build array for graph
+		let values = [];
+		for (let i = 0; i < categories.ids.length; i++) {
+			values.push({"x": [],"y": []});
+		}
 
 		games.forEach(game => {
 
 			if (game && game.magic){
-				const event = game.parent;
-
-				const grade1 = game.magic["grade-01-average"];
-                const grade2 = game.magic["grade-02-average"];
-                const grade3 = game.magic["grade-03-average"];
-                const grade4 = game.magic["grade-04-average"];
-                const grade5 = game.magic["grade-05-average"];
-                const grade6 = game.magic["grade-06-average"];
-                const grade7 = game.magic["grade-07-average"];
-                const grade8 = game.magic["grade-08-average"];
-
-				values[0].x.push(event);
-				values[0].y.push(grade1);
-
-				values[1].x.push(event);
-				values[1].y.push(grade2);
-
-				values[2].x.push(event);
-				values[2].y.push(grade3);
-
-				values[3].x.push(event);
-				values[3].y.push(grade4);
-
-				values[4].x.push(event);
-				values[4].y.push(grade5);
-
-				values[5].x.push(event);
-				values[5].y.push(grade6);
-
-				values[6].x.push(event);
-				values[6].y.push(grade7);
-
-				values[7].x.push(event);
-				values[7].y.push(grade8);
-
+				for (let i = 0; i < categories.ids.length; i++) {
+					values[i].x.push(game.parent);
+					values[i].y.push(game.magic[categories.ids[i]+"-average"]);
+				}
 			}
 		});
 
 		return {
 			"values": values,
-			"lables": [
-				"grade-01",
-				"grade-02",
-				"grade-03",
-				"grade-04",
-				"grade-05",
-				"grade-06",
-				"grade-07",
-				"grade-08"
-			]
+			"lables": categories.lables
 		};
 	}
 
-	parseGamesForGradingCurrent(games, id) {
+	parseGamesForGradingCurrent(games, featured) {
+
+		const categories = this.getCategories(featured);
 
 		let values = [];
 
 		games.forEach(game => {
-
-			if (game && game.magic && game.parent == id){
-				const event = game.parent;
-
-				values.push(game.magic["grade-01-average"]);
-				values.push(game.magic["grade-02-average"]);
-				values.push(game.magic["grade-03-average"]);
-				values.push(game.magic["grade-04-average"]);
-				values.push(game.magic["grade-05-average"]);
-				values.push(game.magic["grade-06-average"]);
-				values.push(game.magic["grade-07-average"]);
-				values.push(game.magic["grade-08-average"]);
-
+			if (game && game.magic && game.parent == featured.id){
+				for (let i = 0; i < categories.ids.length; i++) {
+					values.push(game.magic[categories.ids[i]+"-average"]);
+				}
 			}
 		});
 
 		return {
 			"values": values,
-			"lables": [
-				"grade-01",
-				"grade-02",
-				"grade-03",
-				"grade-04",
-				"grade-05",
-				"grade-06",
-				"grade-07",
-				"grade-08"
-			]
+			"lables": categories.lables
 		};
 	}
 
 
 
-	parseGamesForRankingCurrent(games, id) {
+	parseGamesForRankingCurrent(games, featured) {
+
+		const categories = this.getCategories(featured);
 
 		let values = [];
 
 		games.forEach(game => {
-
-			if (game && game.magic && game.parent == id){
-				const event = game.parent;
-
-				values.push(game.magic["grade-01-result"]);
-				values.push(game.magic["grade-02-result"]);
-				values.push(game.magic["grade-03-result"]);
-				values.push(game.magic["grade-04-result"]);
-				values.push(game.magic["grade-05-result"]);
-				values.push(game.magic["grade-06-result"]);
-				values.push(game.magic["grade-07-result"]);
-				values.push(game.magic["grade-08-result"]);
-
+			if (game && game.magic && game.parent == featured.id){
+				for (let i = 0; i < categories.ids.length; i++) {
+					values.push(game.magic[categories.ids[i]+"-result"]);
+				}
 			}
 		});
 
 		return {
 			"values": values,
-			"lables": [
-				"grade-01",
-				"grade-02",
-				"grade-03",
-				"grade-04",
-				"grade-05",
-				"grade-06",
-				"grade-07",
-				"grade-08"
-			]
+			"lables": categories.lables
 		};
 	}
 
-	parseGamesForRanking(games) {
+	parseGamesForRanking(games, featured) {
 
-		let values = [
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []},
-			{"x": [],"y": []}
-		];
+		const categories = this.getCategories(featured);
+
+		// Build array for graph
+		let values = [];
+		for (let i = 0; i < categories.ids.length; i++) {
+			values.push({"x": [],"y": []});
+		}
 
 		games.forEach(game => {
-
 			if (game && game.magic){
-				const event = game.parent;
-
-				const grade1 = game.magic["grade-01-result"];
-				const grade2 = game.magic["grade-02-result"];
-				const grade3 = game.magic["grade-03-result"];
-				const grade4 = game.magic["grade-04-result"];
-				const grade5 = game.magic["grade-05-result"];
-				const grade6 = game.magic["grade-06-result"];
-				const grade7 = game.magic["grade-07-result"];
-				const grade8 = game.magic["grade-08-result"];
-
-				values[0].x.push(event);
-				values[0].y.push(grade1);
-
-				values[1].x.push(event);
-				values[1].y.push(grade2);
-
-				values[2].x.push(event);
-				values[2].y.push(grade3);
-
-				values[3].x.push(event);
-				values[3].y.push(grade4);
-
-				values[4].x.push(event);
-				values[4].y.push(grade5);
-
-				values[5].x.push(event);
-				values[5].y.push(grade6);
-
-				values[6].x.push(event);
-				values[6].y.push(grade7);
-
-				values[7].x.push(event);
-				values[7].y.push(grade8);
-
+				for (let i = 0; i < categories.ids.length; i++) {
+					values[i].x.push(game.parent);
+					values[i].y.push(game.magic[categories.ids[i]+"-result"]);
+				}
 			}
 		});
 
 		return {
 			"values": values,
-			"lables": [
-				"grade-01",
-				"grade-02",
-				"grade-03",
-				"grade-04",
-				"grade-05",
-				"grade-06",
-				"grade-07",
-				"grade-08"
-			]
+			"lables": categories.lables
 		};
 	}
 
@@ -320,7 +272,6 @@ export default class ContentStatsUser extends Component {
 		let values = [];
 
 		games.forEach(game => {
-
 			if (game && game.meta.author){
 
 				const num = game.meta.author.length;
@@ -339,10 +290,60 @@ export default class ContentStatsUser extends Component {
 	}
 
 
+	parseMyGradesForDist(grades, featured) {
+
+		const categories = this.getCategories(featured);
+
+		// Build array for graph
+		let values = [];
+		for (let i = 0; i < categories.ids.length; i++) {
+			values.push({"x": Array.from(Array(11)).map((e,i)=>i/2),"y": new Array(11).fill(0)});
+		}
+
+		// populate array
+		Object.keys(grades).forEach(key => {
+			if (grades[key]){
+				categories.ids.forEach(c => {
+					if (grades[key][c]){
+						values[categories.ids.indexOf(c)].y[grades[key][c]*2]++;
+					}
+				});
+			}
+		});
+
+		return {
+			"values": values,
+			"lables": categories.lables
+		};
+	}
+
+
+	parseMyGradesForAvgDist(grades) {
+
+		// build array for graph
+		const lables = Array.from(Array(11)).map((e,i)=>i/2);
+		let values = new Array(11).fill(0);
+
+		// populate array
+		Object.keys(grades).forEach(key => {
+			if (grades[key]){
+				Object.keys(grades[key]).forEach(g => {
+					values[grades[key][g]*2]++;
+				});
+			}
+		});
+
+		return {
+			"values": values,
+			"lables": lables
+		};
+	}
+
 
 	render( props, state ) {
 
-		console.log(props);
+		console.log("props", props);
+		console.log("state", state);
 
 		var Class = [];
 		Class.push("content-stats");
@@ -352,81 +353,120 @@ export default class ContentStatsUser extends Component {
 
 			var Data = [];
 
-			if (state && state.games) {
+			if (state) {
+
+				// Stats on my games
+				if (state.games) {
 
 
-				// types pie
-				let Types = [];
-
-				Types.push(<div class="-gap"><span class="-title">Game types</span></div>);
-				let types = this.parseGamesForTypes(state.games);
-				Types.push(<PieChart values={types.values} labels={types.lables} use_percentages={true}></PieChart>);
-
-				Data.push(<div class="section -types">{Types}</div>);
+					Data.push(<ContentCommonBodyTitle title="Your Games From All Events"/>);
 
 
+					// types pie
+					let Types = [];
 
-				// authors pie
-				let Authors = [];
+					Types.push(<div class="-gap"><span class="-title">Game types</span></div>);
+					let types = this.parseGamesForTypes(state.games);
+					Types.push(<PieChart values={types.values} labels={types.lables} use_percentages={true}></PieChart>);
 
-				Authors.push(<div class="-gap"><span class="-title">Number of Authors</span></div>);
-				let authors = this.parseGamesForAuthors(state.games);
-				Authors.push(<PieChart values={authors.values} labels={authors.lables} use_percentages={true}></PieChart>);
-
-				Data.push(<div class="section -authors">{Authors}</div>);
-
-
-				// current grading chart
-				let CG = [];
-
-				CG.push(<div class="-gap"><span class="-title">Current Grading</span></div>);
-				let cg = this.parseGamesForGradingCurrent(state.games, props.featured.id);
-				CG.push(<BarChart values={cg.values} labels={cg.lables}></BarChart>);
-
-				Data.push(<div class="section -cg">{CG}</div>);
+					Data.push(<div class="section -types">{Types}</div>);
 
 
 
-				// current rankings chart
-				let CR = [];
+					// authors pie
+					let Authors = [];
 
-				CR.push(<div class="-gap"><span class="-title">Current Ranking</span></div>);
-				let cr = this.parseGamesForRankingCurrent(state.games, props.featured.id);
-				CR.push(<BarChart values={cr.values} labels={cr.lables}></BarChart>);
+					Authors.push(<div class="-gap"><span class="-title">Number of Authors</span></div>);
+					let authors = this.parseGamesForAuthors(state.games);
+					Authors.push(<PieChart values={authors.values} labels={authors.lables} use_percentages={true}></PieChart>);
 
-				Data.push(<div class="section -cr">{CR}</div>);
-
-
-				// grading graph
-				let Grading = [];
-
-				Grading.push(<div class="-gap"><span class="-title">Game Grading</span></div>);
-				let grading = this.parseGamesForGrading(state.games);
-				Grading.push(<Graph values={grading.values} labels={grading.lables} use_percentages={true}></Graph>);
-
-				Data.push(<div class="section -grading">{Grading}</div>);
+					Data.push(<div class="section -authors">{Authors}</div>);
 
 
+					// ratings graph
+					let Ratings = [];
 
-				// ranking graph
-				let Ranking = [];
+					Ratings.push(<div class="-gap"><span class="-title">Number of Ratings</span></div>);
+					let ratings = this.parseGamesForRatings(state.games, props.featured);
+					Ratings.push(<Graph values={ratings.values} labels={ratings.lables} use_percentages={true}></Graph>);
 
-				Ranking.push(<div class="-gap"><span class="-title">Game rankings</span></div>);
-				let ranking = this.parseGamesForRanking(state.games);
-				Ranking.push(<Graph values={ranking.values} labels={ranking.lables} use_percentages={true}></Graph>);
-
-				Data.push(<div class="section -ranking">{Ranking}</div>);
+					Data.push(<div class="section -ratings">{Ratings}</div>);
 
 
-				// Submissions graph
-				let Ratings = [];
+					if (props.featured.meta['event-finished'] == 1) {
 
-				Ratings.push(<div class="-gap"><span class="-title">Number of Ratings</span></div>);
-				let ratings = this.parseGamesForRatings(state.games);
-				Ratings.push(<Graph values={ratings.values} labels={ratings.lables} use_percentages={true}></Graph>);
+						Data.push(<ContentCommonBodyTitle title="Your Games Results From This Event"/>);
 
-				Data.push(<div class="section -ratings">{Ratings}</div>);
+						// current grading chart
+						let CG = [];
 
+						CG.push(<div class="-gap"><span class="-title">Current Grading</span></div>);
+						let cg = this.parseGamesForGradingCurrent(state.games, props.featured);
+						CG.push(<BarChart values={cg.values} labels={cg.lables}></BarChart>);
+
+						Data.push(<div class="section -cg">{CG}</div>);
+
+
+
+						// current rankings chart
+						let CR = [];
+
+						CR.push(<div class="-gap"><span class="-title">Current Ranking</span></div>);
+						let cr = this.parseGamesForRankingCurrent(state.games, props.featured);
+						CR.push(<BarChart values={cr.values} labels={cr.lables}></BarChart>);
+
+						Data.push(<div class="section -cr">{CR}</div>);
+
+
+					}
+
+					Data.push(<ContentCommonBodyTitle title="Your Games Results"/>);
+
+					// grading graph
+					let Grading = [];
+
+					Grading.push(<div class="-gap"><span class="-title">Game Grading</span></div>);
+					let grading = this.parseGamesForGrading(state.games, props.featured);
+					Grading.push(<Graph values={grading.values} labels={grading.lables} use_percentages={true}></Graph>);
+
+					Data.push(<div class="section -grading">{Grading}</div>);
+
+
+
+					// ranking graph
+					let Ranking = [];
+
+					Ranking.push(<div class="-gap"><span class="-title">Game rankings</span></div>);
+					let ranking = this.parseGamesForRanking(state.games, props.featured);
+					Ranking.push(<Graph values={ranking.values} labels={ranking.lables} use_percentages={true}></Graph>);
+
+					Data.push(<div class="section -ranking">{Ranking}</div>);
+				}
+
+
+				if ((state.grades != null) && (props.user.id == props.node.id)) {
+
+					Data.push(<ContentCommonBodyTitle title="Distribution of given grades"/>);
+
+					// my grade distribution chart
+					let GradeDist = [];
+
+					GradeDist.push(<div class="-gap"><span class="-title">Distribution of my Grading \n(current event)</span></div>);
+					let gradedist = this.parseMyGradesForDist(state.grades, props.featured);
+					GradeDist.push(<Graph values={gradedist.values} labels={gradedist.lables} use_percentages={true}></Graph>);
+
+					Data.push(<div class="section -gradedist">{GradeDist}</div>);
+
+
+					// my avg grade distribution chart
+					let AvgGradeDist = [];
+
+					AvgGradeDist.push(<div class="-gap"><span class="-title">Distribution of my Average Grading \n(current event)</span></div>);
+					let avggradedist = this.parseMyGradesForAvgDist(state.grades);
+					AvgGradeDist.push(<BarChart values={avggradedist.values} labels={avggradedist.lables} use_percentages={true}></BarChart>);
+
+					Data.push(<div class="section -avggradedist">{AvgGradeDist}</div>);
+				}
 			}
 
 
@@ -435,7 +475,6 @@ export default class ContentStatsUser extends Component {
 			//-
 			return (
 				<ContentCommon {...props} class={cN(Class)}>
-					<ContentCommonBodyTitle title="Statistics" />
 					<ContentCommonBody>
 						{Data}
 					</ContentCommonBody>

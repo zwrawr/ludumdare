@@ -80,6 +80,8 @@ export default class BarChart extends Component {
 		let total = values.reduce((a, b) => (a + b), 0);
 		let percentages = values.map((x) => (Math.round((100 * (x / total)) * 100) / 100));
 
+		values = values.map((v) => { return Math.round(100*v)/100; });
+
 		let Bars = [];
 		let Names = [];
 		let Colors = [];

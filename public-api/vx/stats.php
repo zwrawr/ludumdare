@@ -98,6 +98,25 @@ switch ( $node['type'] ) {
 			*/
 
 
+			/*
+			* Private Stuff
+			*/
+
+			// make sure user is logged in
+			if ( $user_id = userAuth_GetID() ) {
+
+				// get user node
+				$node = nodeComplete_GetById($user_id);
+
+				// get author(s) of node
+				$authors = nodeList_GetAuthors($node);
+
+				// check to see if the user is requesting there own user node
+				if ( node_IsAuthor($node, $user_id) ) {
+
+				}
+
+			}
 
 
 

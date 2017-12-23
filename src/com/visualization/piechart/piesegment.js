@@ -17,8 +17,8 @@ export default class PieSegment extends Component {
 
         let angle = props.angle;
 
-        // drawing a segment of 0 width causes artifacting so bail out.
-        if ( angle == 0 ) {
+        // drawing a segment of 0 width causes artifacting so bail out. Also stops NaN or Null Segements being drawn
+        if ( !(angle > 0) ) {
             return;
         }
 
