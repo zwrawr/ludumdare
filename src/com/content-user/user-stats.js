@@ -26,11 +26,20 @@ export default class ContentStatsUser extends Component {
 		this.state = {
 			'games': null,
 			'grades': null,
-			'events': null
+			'events': null,
+			'data': {
+				'grading': null,
+				'ranking': null,
+				'rankingcurrent': null,
+				'gradingcurrent': null,
+				'types': null,
+				'authors': null,
+				'ratings': null
+			}
 		};
 	}
 
-	componentDidMount() {
+	componentWillMount() {
 		//var props = this.props;
 		var state = this.state;
 
@@ -56,7 +65,7 @@ export default class ContentStatsUser extends Component {
 
 		const lables = ids.map( id => featured.meta[id]);
 
-		return {"ids":ids,"lables":lables};
+		return {"ids": ids, "lables": lables};
 	}
 
 	getGames() {
@@ -128,11 +137,11 @@ export default class ContentStatsUser extends Component {
 		// Build array for graph
 		let values = [];
 		for (let i = 0; i < 3; i++) {
-			values.push({"x": [],"y": []});
+			values.push({"x": [], "y": []});
 		}
 
 		games.forEach(game => {
-			if (game && game.magic){
+			if (game && game.magic) {
 
 				values[0].x.push(game.parent);
 				values[0].y.push(game.magic.grade);
@@ -155,12 +164,12 @@ export default class ContentStatsUser extends Component {
 		// Build array for graph
 		let values = [];
 		for (let i = 0; i < categories.ids.length; i++) {
-			values.push({"x": [],"y": []});
+			values.push({"x": [], "y": []});
 		}
 
 		games.forEach(game => {
 
-			if (game && game.magic){
+			if (game && game.magic) {
 				for (let i = 0; i < categories.ids.length; i++) {
 					values[i].x.push(game.parent);
 					values[i].y.push(game.magic[categories.ids[i]+"-average"]);
@@ -181,7 +190,7 @@ export default class ContentStatsUser extends Component {
 		let values = [];
 
 		games.forEach(game => {
-			if (game && game.magic && game.parent == featured.id){
+			if (game && game.magic && game.parent == featured.id) {
 				for (let i = 0; i < categories.ids.length; i++) {
 					values.push(game.magic[categories.ids[i]+"-average"]);
 				}
@@ -203,7 +212,7 @@ export default class ContentStatsUser extends Component {
 		let values = [];
 
 		games.forEach(game => {
-			if (game && game.magic && game.parent == featured.id){
+			if (game && game.magic && game.parent == featured.id) {
 				for (let i = 0; i < categories.ids.length; i++) {
 					values.push(game.magic[categories.ids[i]+"-result"]);
 				}
@@ -223,11 +232,11 @@ export default class ContentStatsUser extends Component {
 		// Build array for graph
 		let values = [];
 		for (let i = 0; i < categories.ids.length; i++) {
-			values.push({"x": [],"y": []});
+			values.push({"x": [], "y": []});
 		}
 
 		games.forEach(game => {
-			if (game && game.magic){
+			if (game && game.magic) {
 				for (let i = 0; i < categories.ids.length; i++) {
 					values[i].x.push(game.parent);
 					values[i].y.push(game.magic[categories.ids[i]+"-result"]);
@@ -249,11 +258,11 @@ export default class ContentStatsUser extends Component {
 
 		games.forEach(game => {
 
-			if (game && game.subtype == "game" && game.subsubtype){
+			if (game && game.subtype == "game" && game.subsubtype) {
 
 				const type = game.subsubtype;
 
-				if (labels.includes(type)){
+				if (labels.includes(type)) {
 					values[labels.indexOf(type)]++;
 				}
 				else {
@@ -272,11 +281,11 @@ export default class ContentStatsUser extends Component {
 		let values = [];
 
 		games.forEach(game => {
-			if (game && game.meta.author){
+			if (game && game.meta.author) {
 
 				const num = game.meta.author.length;
 
-				if (labels.includes(num)){
+				if (labels.includes(num)) {
 					values[labels.indexOf(num)]++;
 				}
 				else {
@@ -297,14 +306,14 @@ export default class ContentStatsUser extends Component {
 		// Build array for graph
 		let values = [];
 		for (let i = 0; i < categories.ids.length; i++) {
-			values.push({"x": Array.from(Array(11)).map((e,i)=>i/2),"y": new Array(11).fill(0)});
+			values.push({"x": Array.from(Array(11)).map((e, i)=>i/2), "y": new Array(11).fill(0)});
 		}
 
 		// populate array
 		Object.keys(grades).forEach(key => {
-			if (grades[key]){
+			if (grades[key]) {
 				categories.ids.forEach(c => {
-					if (grades[key][c]){
+					if (grades[key][c]) {
 						values[categories.ids.indexOf(c)].y[grades[key][c]*2]++;
 					}
 				});
@@ -321,12 +330,12 @@ export default class ContentStatsUser extends Component {
 	parseMyGradesForAvgDist(grades) {
 
 		// build array for graph
-		const lables = Array.from(Array(11)).map((e,i)=>i/2);
+		const lables = Array.from(Array(11)).map((e, i)=>i/2);
 		let values = new Array(11).fill(0);
 
 		// populate array
 		Object.keys(grades).forEach(key => {
-			if (grades[key]){
+			if (grades[key]) {
 				Object.keys(grades[key]).forEach(g => {
 					values[grades[key][g]*2]++;
 				});

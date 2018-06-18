@@ -2,6 +2,7 @@ import {h, Component} 				from 'preact/preact';
 
 import Line							from 'com/visualization/graph/line';
 import Legend						from 'com/visualization/legend/legend';
+import Axes							from 'com/visualization/axes/axes';
 
 export default class Graph extends Component {
 
@@ -38,7 +39,7 @@ export default class Graph extends Component {
 			}
 		}
 
-		return {"min": { "x": min_x, "y": min_y}, "max": { "x": max_x, "y": max_y}};
+		return {"min": {"x": min_x, "y": min_y}, "max": {"x": max_x, "y": max_y}};
 	}
 
     scaleValues( values, range ) {
@@ -53,8 +54,8 @@ export default class Graph extends Component {
 				let x = (series.x[j] - range.min.x)/(range.max.x - range.min.x);
 				let y = (series.y[j] - range.min.y)/(range.max.y - range.min.y);
 
-				s_series_x.push(10+80*x);
-				s_series_y.push(10+80*y);
+				s_series_x.push(10 + (80 * x));
+				s_series_y.push(10 + (80 * y));
 			}
 
 			s_values.push({"x": s_series_x, "y": s_series_y});
@@ -91,8 +92,9 @@ export default class Graph extends Component {
         return (
             <div class="chart">
                 <div class="-graph">
-                    <svg class="-svg" viewBox="0 0 100 100" width="100%" height="100%">
-						<g transform="translate(0,100) scale(1,-1)">
+                    <svg class="-svg" viewBox="0 0 100 100" width="100%" height="100%" transform="translate(0,0) scale(1,-1)">
+						<Axes width={100} height={100} range={range}/>
+						<g>
 							{Lines}
 						</g>
                     </svg>

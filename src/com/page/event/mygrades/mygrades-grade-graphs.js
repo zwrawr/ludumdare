@@ -113,6 +113,7 @@ export default class GradeGraphs extends Component {
 		return Number((arr.reduce((a, b) => a + b) / arr.length).toFixed(decimals));
 	}
 
+	//TODO: Change to graphs
 	render( props ) {
 		const {grades, gradeNames, focusGrade, nodes, showByType, showTrend} = props;
 		const gradeAvgs = [];

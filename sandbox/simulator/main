@@ -82,7 +82,7 @@ $htmlbase = "ld_event"; // Put html report in current directory.
 
 $apibase = "http://api.ludumdare.org/";
 const MAXKEEPUSERS = 1000; // Maximum number of users to store in the event file.
-$usercount = 40; // Something like 40-50 is good for reasonable size tests.
+$usercount = 100; // Something like 40-50 is good for reasonable size tests.
 $userchurn = 5; // Get some new users every event.
 $keepallposts = true;
 $keeppostcount = 100; // Number of posts per user to keep, when keep all posts is false (which it should be for high user counts or long runtimes / stress environments.)
