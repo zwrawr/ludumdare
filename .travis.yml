@@ -5,7 +5,7 @@ php:
 before_install:
   - sudo apt-get update
   - sudo apt-get install -y php7.0-mbstring php7.0-xml ffmpeg imagemagick pngquant gifsicle webp
-  - nvm use 9
+  - nvm use 10
 install:
   - npm install
 script:
